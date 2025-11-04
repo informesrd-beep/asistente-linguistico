@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Lingüístico</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de la fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos (para los botones de Guardar y Limpiar) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Aplicar la fuente Inter como predeterminada */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Fondo gris claro */
+        }
+
+        /* Estilo para el loader */
+        #loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Ocultar elementos por defecto */
+        .hidden {
+            display: none;
+        }
+
+        /* Estilos para los botones de acción */
+        .action-btn {
+            @apply w-full bg-gray-100 text-gray-700 font-medium py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+
+        /* Se eliminaron los estilos del modal de Keep */
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="relative w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-2xl overflow-hidden">
+        <!-- Overlay de carga -->
+        <div id="loader-overlay" class="hidden absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+            <div id="loader"></div>
+        </div>
+
+        <!-- Título -->
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+            Asistente Lingüístico <i class="fas fa-magic text-blue-500"></i>
+        </h1>
+
+        <!-- Área de entrada principal -->
+        <div class="flex flex-col sm:flex-row gap-2 mb-6">
+            <input type="text" id="word-input" placeholder="Escribe una palabra o frase..." class="flex-grow w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow">
+            <button id="generate-btn" class="w-full sm:w-auto bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                Generar
+            </button>
+        </div>
+
+        <!-- Salida Principal (Ejemplos y Comentarios) -->
+        <div id="main-output" class="mb-6 space-y-4">
+            <!-- Ejemplos -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Ejemplos de Uso</h2>
+                <ul id="example-list" class="list-disc list-inside space-y-2 text-gray-600 pl-2">
+                    <li class="italic">Esperando entrada...</li>
+                </ul>
+            </div>
+            <!-- Comentarios -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Comentarios del Asistente</h2>
+                <div id="commentary-box" class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg italic">
+                    Esperando entrada...
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 Botones de Acciones -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-4">
+            <button id="btn-colloquial" class="action-btn" disabled>Coloquial</button>
+            <button id="btn-professional" class="action-btn" disabled>Profesional</button>
+            <button id="btn-etymology" class="action-btn" disabled>Etimología</button>
+            <button id="btn-antonym" class="action-btn" disabled>Antónimo</button>
+            <button id="btn-synonym" class="action-btn" disabled>Semejanza</button>
+            <button id="btn-combine" class="action-btn" disabled>Combinar</button>
+            <button id="btn-translate" class="action-btn" disabled>Traducir</button>
+        </div>
+
+        <!-- Contenedores Ocultos para Combinar y Traducir -->
+        <div id="combine-container" class="hidden flex-col sm:flex-row gap-2 mb-4 p-4 bg-gray-50 rounded-lg">
+            <input type="text" id="combine-input" placeholder="Combinar con..." class="flex-grow w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="combine-submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600">Aceptar</button>
+        </div>
+        
+        <div id="translate-container" class="hidden flex-col sm:flex-row gap-2 mb-4 p-4 bg-gray-50 rounded-lg">
+            <select id="translate-select" class="flex-grow w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Inglés">Inglés</option>
+                <option value="Francés">Francés</option>
+                <option value="Alemán">Alemán</option>
+                <option value="Italiano">Italiano</option>
+                <option value="Portugués">Portugués</option>
+                <option value="Japonés">Japonés</option>
+                <option value="Chino (Mandarín)">Chino (Mandarín)</option>
+            </select>
+            <button id="translate-submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600">Aceptar</button>
+        </div>
+
+        <!-- Salida Secundaria (para los 7 botones) -->
+        <div id="secondary-output" class="bg-gray-50 rounded-lg p-4 min-h-[100px] border border-gray-200">
+            <p class="text-gray-500 italic text-center">Aquí aparecerán los resultados de las acciones.</p>
+        </div>
+
+        <!-- Botones de Pie de Página (Guardar, Limpiar) -->
+        <div class="flex gap-2 mt-6">
+            <!-- Se eliminó el botón de Guardar en Keep -->
+            <button id="btn-clear" title="Limpiar todo" class="flex items-center justify-center gap-2 bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors shadow">
+                <i class="fas fa-sync-alt"></i>
+                <span class="hidden sm:inline">Limpiar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Se eliminó el Modal de Google Keep -->
+
+    <script type="module">
+        // --- CONSTANTES Y REFERENCIAS DOM ---
+
+        // Clave de API
+        const API_KEY = "AIzaSyAXK_xEcFD0LX-jjIepTaQ37BgRvJwCNg0"; // <--- ¡CLAVE CORREGIDA CON COMILLAS!
+        // URL del modelo Gemini
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+
+        // Referencias a elementos del DOM
+        const wordInput = document.getElementById('word-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const loaderOverlay = document.getElementById('loader-overlay');
+        
+        const mainOutput = document.getElementById('main-output');
+        const exampleList = document.getElementById('example-list');
+        const commentaryBox = document.getElementById('commentary-box');
+        const secondaryOutput = document.getElementById('secondary-output');
+
+        const actionButtons = [
+            document.getElementById('btn-colloquial'),
+            document.getElementById('btn-professional'),
+            document.getElementById('btn-etymology'),
+            document.getElementById('btn-antonym'),
+            document.getElementById('btn-synonym'),
+            document.getElementById('btn-combine'),
+            document.getElementById('btn-translate')
+        ];
+        // Se eliminó la referencia a btnKeep
+        const btnClear = document.getElementById('btn-clear');
+
+        const combineContainer = document.getElementById('combine-container');
+        const combineInput = document.getElementById('combine-input');
+        const combineSubmit = document.getElementById('combine-submit');
+
+        const translateContainer = document.getElementById('translate-container');
+        const translateSelect = document.getElementById('translate-select');
+        const translateSubmit = document.getElementById('translate-submit');
+
+        // Se eliminaron las referencias al modal de Keep
+
+        // --- FUNCIONES AUXILIARES ---
+
+        /**
+         * Muestra u oculta el overlay de carga.
+         * @param {boolean} show - True para mostrar, false para ocultar.
+         */
+        function showLoader(show) {
+            loaderOverlay.classList.toggle('hidden', !show);
+            loaderOverlay.classList.toggle('flex', show);
+        }
+
+        /**
+         * Habilita o deshabilita los botones de acción.
+         * @param {boolean} enabled - True para habilitar, false para deshabilitar.
+         */
+        function setActionButtonsEnabled(enabled) {
+            actionButtons.forEach(btn => btn.disabled = !enabled);
+            // Se eliminó la lógica de btnKeep
+        }
+
+        /**
+         * Oculta los contenedores de entrada secundaria.
+         */
+        function hideSecondaryInputs() {
+            combineContainer.classList.add('hidden');
+            translateContainer.classList.add('hidden');
+        }
+
+        /**
+         * Limpia todas las salidas y entradas.
+         */
+        function clearAll() {
+            wordInput.value = '';
+            exampleList.innerHTML = '<li class="italic">Esperando entrada...</li>';
+            commentaryBox.innerHTML = '<em class="italic">Esperando entrada...</em>';
+            secondaryOutput.innerHTML = '<p class="text-gray-500 italic text-center">Aquí aparecerán los resultados de las acciones.</p>';
+            setActionButtonsEnabled(false);
+            hideSecondaryInputs();
+            combineInput.value = '';
+        }
+
+        /**
+         * Muestra un error en el área de salida secundaria.
+         * @param {string} message - El mensaje de error.
+         * @param {string} [details] - Detalles adicionales del error.
+         */
+        function showError(message, details = '') {
+            secondaryOutput.innerHTML = `
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg">
+                    <p class="font-bold">${message}</p>
+                    <p class="text-sm">${details}</p>
+                </div>
+            `;
+        }
+
+        /**
+         * Función central para llamar a la API de Gemini con reintentos.
+         * @param {object} payload - El cuerpo de la solicitud para la API.
+         * @param {number} maxRetries - Número máximo de reintentos.
+         * @returns {Promise<object>} - La respuesta de la API.
+         */
+        async function callGeminiAPI(payload, maxRetries = 3) {
+            let attempt = 0;
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error de API: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (!result.candidates || !result.candidates[0] || !result.candidates[0].content) {
+                         throw new Error("Respuesta inesperada de la API. No se encontraron 'candidates'.");
+                    }
+                    
+                    return result;
+
+                } catch (error) {
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        console.error("Error final al llamar a la API de Gemini:", error);
+                        throw error;
+                    }
+                    const delay = Math.pow(2, attempt) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        // --- MANEJADORES DE EVENTOS PRINCIPALES ---
+
+        /**
+         * Maneja la generación principal (3 ejemplos + comentarios).
+         */
+        async function handleMainGeneration() {
+            const word = wordInput.value.trim();
+            if (!word) {
+                showError("Por favor, introduce una palabra o frase.");
+                return;
+            }
+
+            showLoader(true);
+            hideSecondaryInputs();
+            secondaryOutput.innerHTML = ''; // Limpiar salida secundaria
+
+            // Definir el esquema JSON para la respuesta de la API
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    ejemplos: {
+                        type: "ARRAY",
+                        items: { type: "STRING" },
+                        description: "Un array de 3 oraciones de ejemplo usando la palabra."
+                    },
+                    comentarios: {
+                        type: "STRING",
+                        description: "Un comentario de 2 a 5 líneas sobre el uso, formalidad o contexto de la palabra/frase."
+                    }
+                },
+                required: ["ejemplos", "comentarios"]
+            };
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Analiza la palabra o frase: "${word}".` }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: "Eres un asistente lingüístico experto en español. El usuario te dará una palabra o frase. Debes responder estrictamente en formato JSON, siguiendo el esquema proporcionado. Los comentarios deben ser concisos (máximo 5 líneas)." }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema
+                }
+            };
+
+            try {
+                const result = await callGeminiAPI(payload);
+                const part = result.candidates[0].content.parts[0];
+                
+                if (!part || !part.text) {
+                    throw new Error("La respuesta JSON de la API está vacía o mal formada.");
+                }
+
+                const data = JSON.parse(part.text);
+
+                // Mostrar ejemplos
+                exampleList.innerHTML = data.ejemplos
+                    .map(ex => `<li class="text-gray-700">${ex}</li>`)
+                    .join('');
+
+                // Mostrar comentarios
+                commentaryBox.textContent = data.comentarios;
+                
+                setActionButtonsEnabled(true);
+                secondaryOutput.innerHTML = '<p class="text-gray-500 italic text-center">Selecciona una acción avanzada.</p>';
+
+            } catch (error) {
+                console.error("Error en handleMainGeneration:", error);
+                showError("Error al generar el contenido", error.message);
+                setActionButtonsEnabled(false);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        /**
+         * Función genérica para manejar los botones de acción simples.
+         * @param {string} title - Título para la salida secundaria.
+         * @param {string} systemInstruction - La instrucción para la IA.
+         */
+        async function handleSimpleAction(title, systemInstruction) {
+            const word = wordInput.value.trim();
+            if (!word) return;
+
+            showLoader(true);
+            hideSecondaryInputs();
+            const userQuery = `Para la palabra/frase: "${word}"`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            try {
+                const result = await callGeminiAPI(payload);
+                const text = result.candidates[0].content.parts[0].text;
+                secondaryOutput.innerHTML = `
+                    <h3 class="font-semibold text-lg mb-2">${title}</h3>
+                    <div class="prose prose-sm max-w-none">${text.replace(/\n/g, '<br>')}</div>
+                `;
+            } catch (error) {
+                console.error(`Error en ${title}:`, error);
+                showError(`Error al generar "${title}"`, error.message);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        /**
+         * Maneja la solicitud de etimología (IA + Búsqueda Web).
+         */
+        async function handleEtymology() {
+            const word = wordInput.value.trim();
+            if (!word) return;
+
+            showLoader(true);
+            hideSecondaryInputs();
+            let outputHtml = `<h3 class="font-semibold text-lg mb-2">Etimología de "${word}"</h3>`;
+
+            try {
+                // 1. Generación de la IA
+                const iaPayload = {
+                    contents: [{ parts: [{ text: `Explica brevemente la etimología de: "${word}"` }] }],
+                    systemInstruction: { parts: [{ text: "Eres un etimólogo. Responde en español de forma concisa." }] }
+                };
+                const iaResult = await callGeminiAPI(iaPayload);
+                const iaText = iaResult.candidates[0].content.parts[0].text;
+                outputHtml += `
+                    <h4 class="font-medium text-md mt-4 mb-1">Explicación del Asistente:</h4>
+                    <p class="text-sm">${iaText}</p>
+                `;
+
+                // 2. Búsqueda con Grounding en etimologias.dechile.net
+                const searchPayload = {
+                    contents: [{ parts: [{ text: `Etimología de ${word}` }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: `Eres un asistente de búsqueda. Busca la etimología de la palabra proporcionada, dando absoluta prioridad a resultados de "etimologias.dechile.net". Responde en español, resumiendo la información encontrada. Cita tu fuente.` }] }
+                };
+                
+                // Nota: Restringir a un sitio específico (site:etimologias.dechile.net) en el prompt de usuario puede ser más efectivo.
+                searchPayload.contents[0].parts[0].text = `Etimología de "${word}" site:etimologias.dechile.net`;
+
+                const searchResult = await callGeminiAPI(searchPayload);
+                const searchPart = searchResult.candidates[0].content.parts[0];
+                const searchText = searchPart.text || "No se encontró un resumen.";
+                
+                outputHtml += `
+                    <h4 class="font-medium text-md mt-4 mb-1">Resultado de etimologias.dechile.net:</h4>
+                    <p class="text-sm">${searchText}</p>
+                `;
+
+                // Añadir citas si existen
+                const metadata = searchResult.candidates[0].groundingMetadata;
+                if (metadata && metadata.groundingAttributions && metadata.groundingAttributions.length > 0) {
+                    const source = metadata.groundingAttributions[0].web;
+                    if (source && source.uri) {
+                        outputHtml += `
+                            <p class="text-xs mt-2">
+                                <span class="font-semibold">Fuente:</span>
+                                <a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                    ${source.title || source.uri}
+                                </a>
+                            </p>
+                        `;
+                    }
+                } else if (!searchText.includes("No se encontró")) {
+                     outputHtml += `<p class="text-xs mt-2 text-gray-500">No se encontraron citas web específicas para esta búsqueda.</p>`;
+                }
+                
+                secondaryOutput.innerHTML = outputHtml;
+
+            } catch (error) {
+                console.error("Error en handleEtymology:", error);
+                showError("Error al buscar la etimología", error.message);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Se eliminaron las funciones 'copyModalText' y 'handleSaveToKeep'
+
+        // --- ASIGNACIÓN DE EVENT LISTENERS ---
+        // ¡RESTAURADOS!
+
+        // Generación Principal
+        generateBtn.addEventListener('click', handleMainGeneration);
+        wordInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                handleMainGeneration();
+            }
+        });
+
+        // 7 Botones de Acción
+        actionButtons[0].addEventListener('click', () => handleSimpleAction(
+            "Contexto Coloquial",
+            "Eres un asistente lingüístico. Genera 2 oraciones de ejemplo en un contexto COLOQUIAL o informal para la palabra/frase dada. Responde solo con las 2 oraciones."
+        ));
+
+        actionButtons[1].addEventListener('click', () => handleSimpleAction(
+            "Contexto Profesional/Laboral",
+            "Eres un asistente lingüístico. Genera 2 oraciones de ejemplo en un contexto PROFESIONAL o laboral para la palabra/frase dada. Responde solo con las 2 oraciones."
+        ));
+
+        actionButtons[2].addEventListener('click', handleEtymology);
+
+        actionButtons[3].addEventListener('click', () => handleSimpleAction(
+            "Antónimo(s)",
+            "Eres un asistente lingüístico. Proporciona uno o dos antónimos claros para la palabra/frase dada. Si no tiene un antónimo directo, explícalo brevemente. Responde solo con el antónimo o la explicación."
+        ));
+
+        actionButtons[4].addEventListener('click', () => handleSimpleAction(
+            "Semejanza o Alternativa",
+            "Eres un asistente lingüístico. Sugiere una palabra o frase similar, más adecuada o más apropiada que la palabra/frase dada. Explica brevemente por qué es una buena alternativa. Responde en un párrafo corto."
+        ));
+
+        // Mostrar/Ocultar contenedores secundarios
+        actionButtons[5].addEventListener('click', () => {
+            hideSecondaryInputs();
+            combineContainer.classList.remove('hidden');
+        });
+        
+        actionButtons[6].addEventListener('click', () => {
+            hideSecondaryInputs();
+            translateContainer.classList.remove('hidden');
+        });
+
+        // Acciones de contenedores secundarios
+        combineSubmit.addEventListener('click', () => {
+            const word1 = wordInput.value.trim();
+            const word2 = combineInput.value.trim();
+            if (!word1 || !word2) {
+                showError("Se necesitan ambas palabras para combinar.");
+                return;
+            }
+            handleSimpleAction(
+                `Combinando "${word1}" y "${word2}"`,
+                `Eres un asistente lingüístico. Genera una oración coherente en español que utilice las siguientes dos palabras/frases: "${word1}" y "${word2}". Responde solo con la oración.`
+            );
+            combineInput.value = '';
+            hideSecondaryInputs();
+        });
+
+        translateSubmit.addEventListener('click', () => {
+            const word = wordInput.value.trim();
+            const lang = translateSelect.value;
+            if (!word) return;
+            
+            handleSimpleAction(
+                `Traducción al ${lang}`,
+                `Eres un traductor experto. Traduce la siguiente palabra/frase al ${lang}: "${word}". Responde solo con la traducción.`
+            );
+            hideSecondaryInputs();
+        });
+
+
+        // Botones de pie de página
+        // Se eliminó el listener de btnKeep
+        btnClear.addEventListener('click', clearAll);
+
+        // Se eliminaron los listeners del modal
+
+        // Estado inicial
+        clearAll();
+        setActionButtonsEnabled(false); // Asegurarse de que estén deshabilitados al inicio
+
+    </script>
+
+</body>
+</html>
