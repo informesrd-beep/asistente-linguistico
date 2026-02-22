@@ -37,8 +37,6 @@
         .hidden {
             display: none;
         }
-
-        /* Se eliminaron los estilos del modal de Keep */
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -80,11 +78,6 @@
             </div>
         </div>
 
-        <!-- 
-          ¡CAMBIOS AQUÍ! 
-          7 Botones de Acciones con forma "rectangular ovalada" (rounded-full) y colores pastel.
-          Se aumentó el gap-x a 3 para más espacio.
-        -->
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
             <!-- Grupo 1: Verde Pastel -->
             <button id="btn-colloquial"   class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-green-400 hover:bg-green-500" disabled>Coloquial</button>
@@ -128,7 +121,6 @@
 
         <!-- Botones de Pie de Página (Guardar, Limpiar) -->
         <div class="flex gap-2 mt-6">
-            <!-- Se eliminó el botón de Guardar en Keep -->
             <button id="btn-clear" title="Limpiar todo" class="flex items-center justify-center gap-2 bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors shadow">
                 <i class="fas fa-sync-alt"></i>
                 <span class="hidden sm:inline">Limpiar</span>
@@ -136,15 +128,14 @@
         </div>
     </div>
 
-    <!-- Se eliminó el Modal de Google Keep -->
-
     <script type="module">
         // --- CONSTANTES Y REFERENCIAS DOM ---
 
         // Clave de API
-        const API_KEY = "AIzaSyAXK_xEcFD0LX-jjIepTaQ37BgRvJwCNg0"; // <--- ¡CLAVE CORREGIDA CON COMILLAS!
-        // URL del modelo Gemini
+        const API_KEY = "AIzaSyAXK_xEcFD0LX-jjIepTaQ37BgRvJwCNg0";
+        // URL del modelo Gemini (RESTABLECIDA A LA VERSIÓN ESTABLE 1.5-FLASH)
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        
         // Referencias a elementos del DOM
         const wordInput = document.getElementById('word-input');
         const generateBtn = document.getElementById('generate-btn');
@@ -164,7 +155,7 @@
             document.getElementById('btn-combine'),
             document.getElementById('btn-translate')
         ];
-        // Se eliminó la referencia a btnKeep
+        
         const btnClear = document.getElementById('btn-clear');
 
         const combineContainer = document.getElementById('combine-container');
@@ -175,39 +166,22 @@
         const translateSelect = document.getElementById('translate-select');
         const translateSubmit = document.getElementById('translate-submit');
 
-        // Se eliminaron las referencias al modal de Keep
-
         // --- FUNCIONES AUXILIARES ---
 
-        /**
-         * Muestra u oculta el overlay de carga.
-         * @param {boolean} show - True para mostrar, false para ocultar.
-         */
         function showLoader(show) {
             loaderOverlay.classList.toggle('hidden', !show);
             loaderOverlay.classList.toggle('flex', show);
         }
 
-        /**
-         * Habilita o deshabilita los botones de acción.
-         * @param {boolean} enabled - True para habilitar, false para deshabilitar.
-         */
         function setActionButtonsEnabled(enabled) {
             actionButtons.forEach(btn => btn.disabled = !enabled);
-            // Se eliminó la lógica de btnKeep
         }
 
-        /**
-         * Oculta los contenedores de entrada secundaria.
-         */
         function hideSecondaryInputs() {
             combineContainer.classList.add('hidden');
             translateContainer.classList.add('hidden');
         }
 
-        /**
-         * Limpia todas las salidas y entradas.
-         */
         function clearAll() {
             wordInput.value = '';
             exampleList.innerHTML = '<li class="italic">Esperando entrada...</li>';
@@ -218,11 +192,6 @@
             combineInput.value = '';
         }
 
-        /**
-         * Muestra un error en el área de salida secundaria.
-         * @param {string} message - El mensaje de error.
-         * @param {string} [details] - Detalles adicionales del error.
-         */
         function showError(message, details = '') {
             secondaryOutput.innerHTML = `
                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg">
@@ -232,12 +201,6 @@
             `;
         }
 
-        /**
-         * Función central para llamar a la API de Gemini con reintentos.
-         * @param {object} payload - El cuerpo de la solicitud para la API.
-         * @param {number} maxRetries - Número máximo de reintentos.
-         * @returns {Promise<object>} - La respuesta de la API.
-         */
         async function callGeminiAPI(payload, maxRetries = 3) {
             let attempt = 0;
             while (attempt < maxRetries) {
@@ -274,9 +237,6 @@
 
         // --- MANEJADORES DE EVENTOS PRINCIPALES ---
 
-        /**
-         * Maneja la generación principal (3 ejemplos + comentarios).
-         */
         async function handleMainGeneration() {
             const word = wordInput.value.trim();
             if (!word) {
@@ -286,9 +246,8 @@
 
             showLoader(true);
             hideSecondaryInputs();
-            secondaryOutput.innerHTML = ''; // Limpiar salida secundaria
+            secondaryOutput.innerHTML = ''; 
 
-            // Definir el esquema JSON para la respuesta de la API
             const schema = {
                 type: "OBJECT",
                 properties: {
@@ -328,12 +287,10 @@
 
                 const data = JSON.parse(part.text);
 
-                // Mostrar ejemplos
                 exampleList.innerHTML = data.ejemplos
                     .map(ex => `<li class="text-gray-700">${ex}</li>`)
                     .join('');
 
-                // Mostrar comentarios
                 commentaryBox.textContent = data.comentarios;
                 
                 setActionButtonsEnabled(true);
@@ -348,11 +305,6 @@
             }
         }
 
-        /**
-         * Función genérica para manejar los botones de acción simples.
-         * @param {string} title - Título para la salida secundaria.
-         * @param {string} systemInstruction - La instrucción para la IA.
-         */
         async function handleSimpleAction(title, systemInstruction) {
             const word = wordInput.value.trim();
             if (!word) return;
@@ -381,9 +333,6 @@
             }
         }
 
-        /**
-         * Maneja la solicitud de etimología (IA + Búsqueda Web).
-         */
         async function handleEtymology() {
             const word = wordInput.value.trim();
             if (!word) return;
@@ -408,11 +357,10 @@
                 // 2. Búsqueda con Grounding en etimologias.dechile.net
                 const searchPayload = {
                     contents: [{ parts: [{ text: `Etimología de ${word}` }] }],
-                    tools: [{ "google_search": {} }],
+                    tools: [{ "googleSearch": {} }], // <--- CORRECCIÓN A CAMELCASE APLICADA
                     systemInstruction: { parts: [{ text: `Eres un asistente de búsqueda. Busca la etimología de la palabra proporcionada, dando absoluta prioridad a resultados de "etimologias.dechile.net". Responde en español, resumiendo la información encontrada. Cita tu fuente.` }] }
                 };
                 
-                // Nota: Restringir a un sitio específico (site:etimologias.dechile.net) en el prompt de usuario puede ser más efectivo.
                 searchPayload.contents[0].parts[0].text = `Etimología de "${word}" site:etimologias.dechile.net`;
 
                 const searchResult = await callGeminiAPI(searchPayload);
@@ -424,7 +372,6 @@
                     <p class="text-sm">${searchText}</p>
                 `;
 
-                // Añadir citas si existen
                 const metadata = searchResult.candidates[0].groundingMetadata;
                 if (metadata && metadata.groundingAttributions && metadata.groundingAttributions.length > 0) {
                     const source = metadata.groundingAttributions[0].web;
@@ -452,12 +399,8 @@
             }
         }
 
-        // Se eliminaron las funciones 'copyModalText' y 'handleSaveToKeep'
-
         // --- ASIGNACIÓN DE EVENT LISTENERS ---
-        // ¡RESTAURADOS!
 
-        // Generación Principal
         generateBtn.addEventListener('click', handleMainGeneration);
         wordInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') {
@@ -465,7 +408,6 @@
             }
         });
 
-        // 7 Botones de Acción
         actionButtons[0].addEventListener('click', () => handleSimpleAction(
             "Contexto Coloquial",
             "Eres un asistente lingüístico. Genera 2 oraciones de ejemplo en un contexto COLOQUIAL o informal para la palabra/frase dada. Responde solo con las 2 oraciones."
@@ -488,7 +430,6 @@
             "Eres un asistente lingüístico. Sugiere una palabra o frase similar, más adecuada o más apropiada que la palabra/frase dada. Explica brevemente por qué es una buena alternativa. Responde en un párrafo corto."
         ));
 
-        // Mostrar/Ocultar contenedores secundarios
         actionButtons[5].addEventListener('click', () => {
             hideSecondaryInputs();
             combineContainer.classList.remove('hidden');
@@ -499,7 +440,6 @@
             translateContainer.classList.remove('hidden');
         });
 
-        // Acciones de contenedores secundarios
         combineSubmit.addEventListener('click', () => {
             const word1 = wordInput.value.trim();
             const word2 = combineInput.value.trim();
@@ -527,20 +467,12 @@
             hideSecondaryInputs();
         });
 
-
-        // Botones de pie de página
-        // Se eliminó el listener de btnKeep
         btnClear.addEventListener('click', clearAll);
-
-        // Se eliminaron los listeners del modal
 
         // Estado inicial
         clearAll();
-        setActionButtonsEnabled(false); // Asegurarse de que estén deshabilitados al inicio
+        setActionButtonsEnabled(false); 
 
     </script>
-
 </body>
 </html>
-
-
