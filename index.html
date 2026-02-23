@@ -129,14 +129,18 @@
     </div>
 
     <script type="module">
+        // ============================================================================
         // --- CONSTANTES Y REFERENCIAS DOM ---
+        // ============================================================================
 
-        // Clave de API
-        const API_KEY = "AIzaSyAXK_xEcFD0LX-jjIepTaQ37BgRvJwCNg0";
-        // URL del modelo Gemini (RESTABLECIDA A LA VERSIÓN ESTABLE 1.5-FLASH)
+        // ⚠️ PASO 2: REEMPLAZA ESTE TEXTO CON TU NUEVA CLAVE RECIÉN CREADA EN GOOGLE CLOUD
+        const API_KEY = "AIzaSyAhqp0AXViDoIAcSUGZvQs1P05IHCwuH7c"; 
+        
+        // URL del modelo Gemini (RESTABLECIDA A LA VERSIÓN ESTABLE 1.5-FLASH PARA EVITAR ERROR 404)
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
         
-        // Referencias a elementos del DOM
+        // ============================================================================
+
         const wordInput = document.getElementById('word-input');
         const generateBtn = document.getElementById('generate-btn');
         const loaderOverlay = document.getElementById('loader-overlay');
@@ -357,7 +361,7 @@
                 // 2. Búsqueda con Grounding en etimologias.dechile.net
                 const searchPayload = {
                     contents: [{ parts: [{ text: `Etimología de ${word}` }] }],
-                    tools: [{ "googleSearch": {} }], // <--- CORRECCIÓN A CAMELCASE APLICADA
+                    tools: [{ "googleSearch": {} }], // <--- CORRECCIÓN A CAMELCASE APLICADA PARA EVITAR ERROR 400
                     systemInstruction: { parts: [{ text: `Eres un asistente de búsqueda. Busca la etimología de la palabra proporcionada, dando absoluta prioridad a resultados de "etimologias.dechile.net". Responde en español, resumiendo la información encontrada. Cita tu fuente.` }] }
                 };
                 
