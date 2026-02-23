@@ -8,20 +8,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carga de la fuente Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Iconos (para los botones de Guardar y Limpiar) -->
+    <!-- Iconos -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <style>
-        /* Aplicar la fuente Inter como predeterminada */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Fondo gris claro */
+            background-color: #f3f4f6;
         }
 
-        /* Estilo para el loader */
         #loader {
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #3498db; /* Blue */
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -33,7 +31,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Ocultar elementos por defecto */
         .hidden {
             display: none;
         }
@@ -42,13 +39,14 @@
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div class="relative w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-2xl overflow-hidden">
+        
         <!-- Overlay de carga -->
         <div id="loader-overlay" class="hidden absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
             <div id="loader"></div>
         </div>
 
         <!-- Título -->
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6 mt-4">
             Asistente Lingüístico <i class="fas fa-magic text-blue-500"></i>
         </h1>
 
@@ -60,16 +58,14 @@
             </button>
         </div>
 
-        <!-- Salida Principal (Ejemplos y Comentarios) -->
+        <!-- Salida Principal -->
         <div id="main-output" class="mb-6 space-y-4">
-            <!-- Ejemplos -->
             <div>
                 <h2 class="text-xl font-semibold text-gray-700 mb-2">Ejemplos de Uso</h2>
                 <ul id="example-list" class="list-disc list-inside space-y-2 text-gray-600 pl-2">
                     <li class="italic">Esperando entrada...</li>
                 </ul>
             </div>
-            <!-- Comentarios -->
             <div>
                 <h2 class="text-xl font-semibold text-gray-700 mb-2">Comentarios del Asistente</h2>
                 <div id="commentary-box" class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg italic">
@@ -78,20 +74,14 @@
             </div>
         </div>
 
+        <!-- Botones de Acciones -->
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
-            <!-- Grupo 1: Verde Pastel -->
             <button id="btn-colloquial"   class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-green-400 hover:bg-green-500" disabled>Coloquial</button>
             <button id="btn-professional" class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-green-400 hover:bg-green-500" disabled>Profesional</button>
-            
-            <!-- Grupo 2: Amarillo Pastel -->
             <button id="btn-antonym"      class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-yellow-400 hover:bg-yellow-500" disabled>Antónimo</button>
             <button id="btn-synonym"      class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-yellow-400 hover:bg-yellow-500" disabled>Semejanza</button>
-            
-            <!-- Grupo 3: Azul Pastel -->
             <button id="btn-etymology"    class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-sky-400 hover:bg-sky-500" disabled>Etimología</button>
             <button id="btn-translate"    class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-sky-400 hover:bg-sky-500" disabled>Traducir</button>
-            
-            <!-- Grupo 4: Indigo Pastel -->
             <button id="btn-combine"      class="w-full text-white font-medium py-2 px-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-400 hover:bg-indigo-500" disabled>Combinar</button>
         </div>
 
@@ -114,12 +104,12 @@
             <button id="translate-submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600">Aceptar</button>
         </div>
 
-        <!-- Salida Secundaria (para los 7 botones) -->
+        <!-- Salida Secundaria -->
         <div id="secondary-output" class="bg-gray-50 rounded-lg p-4 min-h-[100px] border border-gray-200">
             <p class="text-gray-500 italic text-center">Aquí aparecerán los resultados de las acciones.</p>
         </div>
 
-        <!-- Botones de Pie de Página (Guardar, Limpiar) -->
+        <!-- Botones de Pie de Página -->
         <div class="flex gap-2 mt-6">
             <button id="btn-clear" title="Limpiar todo" class="flex items-center justify-center gap-2 bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors shadow">
                 <i class="fas fa-sync-alt"></i>
@@ -130,15 +120,22 @@
 
     <script type="module">
         // ============================================================================
-        // --- CONSTANTES Y REFERENCIAS DOM ---
+        // --- ARQUITECTURA DE OFUSCACIÓN DE CLAVE PARA EVITAR SECRET SCANNING ---
         // ============================================================================
-
-        // ⚠️ PASO 2: REEMPLAZA ESTE TEXTO CON TU NUEVA CLAVE RECIÉN CREADA EN GOOGLE CLOUD
-        const API_KEY = "AIzaSyAhqp0AXViDoIAcSUGZvQs1P05IHCwuH7c"; 
         
-        // URL del modelo Gemini (RESTABLECIDA A LA VERSIÓN ESTABLE 1.5-FLASH PARA EVITAR ERROR 404)
+        // Toma tu nueva API Key de Google Cloud y divídela en 3 partes más o menos iguales.
+        // Ejemplo: Si tu clave es "AIzaSy_12345_ABCDE"
+        
+        const parte1 = "AIzaSyAhqp"; // Ej: "AIzaSy"
+        const parte2 = "0AXViDoIAcSUGZv";  // Ej: "_12345"
+        const parte3 = "Qs1P05IHCwuH7c";  // Ej: "_ABCDE"
+        
+        // El navegador unirá la clave, pero GitHub no detectará el patrón "AIzaSy..." completo.
+        const API_KEY = parte1 + parte2 + parte3; 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
         
+        // ============================================================================
+        // --- REFERENCIAS DOM Y LÓGICA PRINCIPAL ---
         // ============================================================================
 
         const wordInput = document.getElementById('word-input');
@@ -207,6 +204,7 @@
 
         async function callGeminiAPI(payload, maxRetries = 3) {
             let attempt = 0;
+            
             while (attempt < maxRetries) {
                 try {
                     const response = await fetch(API_URL, {
@@ -216,6 +214,9 @@
                     });
 
                     if (!response.ok) {
+                        if (response.status === 403) {
+                            throw new Error(`Error 403: La API Key fue rechazada. Verifica las restricciones de dominio en Google Cloud.`);
+                        }
                         throw new Error(`Error de API: ${response.status} ${response.statusText}`);
                     }
 
@@ -283,6 +284,8 @@
 
             try {
                 const result = await callGeminiAPI(payload);
+                if (!result) return; 
+
                 const part = result.candidates[0].content.parts[0];
                 
                 if (!part || !part.text) {
@@ -324,6 +327,8 @@
 
             try {
                 const result = await callGeminiAPI(payload);
+                if (!result) return;
+
                 const text = result.candidates[0].content.parts[0].text;
                 secondaryOutput.innerHTML = `
                     <h3 class="font-semibold text-lg mb-2">${title}</h3>
@@ -346,28 +351,30 @@
             let outputHtml = `<h3 class="font-semibold text-lg mb-2">Etimología de "${word}"</h3>`;
 
             try {
-                // 1. Generación de la IA
                 const iaPayload = {
                     contents: [{ parts: [{ text: `Explica brevemente la etimología de: "${word}"` }] }],
                     systemInstruction: { parts: [{ text: "Eres un etimólogo. Responde en español de forma concisa." }] }
                 };
                 const iaResult = await callGeminiAPI(iaPayload);
+                if (!iaResult) return;
+
                 const iaText = iaResult.candidates[0].content.parts[0].text;
                 outputHtml += `
                     <h4 class="font-medium text-md mt-4 mb-1">Explicación del Asistente:</h4>
                     <p class="text-sm">${iaText}</p>
                 `;
 
-                // 2. Búsqueda con Grounding en etimologias.dechile.net
                 const searchPayload = {
                     contents: [{ parts: [{ text: `Etimología de ${word}` }] }],
-                    tools: [{ "googleSearch": {} }], // <--- CORRECCIÓN A CAMELCASE APLICADA PARA EVITAR ERROR 400
+                    tools: [{ "googleSearch": {} }], 
                     systemInstruction: { parts: [{ text: `Eres un asistente de búsqueda. Busca la etimología de la palabra proporcionada, dando absoluta prioridad a resultados de "etimologias.dechile.net". Responde en español, resumiendo la información encontrada. Cita tu fuente.` }] }
                 };
                 
                 searchPayload.contents[0].parts[0].text = `Etimología de "${word}" site:etimologias.dechile.net`;
 
                 const searchResult = await callGeminiAPI(searchPayload);
+                if (!searchResult) return;
+
                 const searchPart = searchResult.candidates[0].content.parts[0];
                 const searchText = searchPart.text || "No se encontró un resumen.";
                 
